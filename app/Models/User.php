@@ -38,6 +38,10 @@ class User extends Authenticatable
         ];
     }
 
+    public function isSeller(): bool {
+        return $this->role === 'seller';
+    }
+
     public function product(): HasMany {
         return $this->hasMany(Product::class, 'user_id', 'id');
     }

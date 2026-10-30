@@ -12,7 +12,7 @@ class Product extends Model
 {
     use HasUuids, HasFactory;
 
-    protected $table = 'product';
+    protected $table = 'products';
 
     protected $fillable = [
         'name',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -40,6 +40,10 @@ trait ApiResponse
     }
 
     public function notFound(string $message = 'Content not found.', int $code = 404): JsonResponse {
+        return $this->error($message, $code);
+    }
+
+    public function forbidden(string $message = 'You are forbid to enter this content.', int $code = 403): JsonResponse {
         return $this->error($message, $code);
     }
 

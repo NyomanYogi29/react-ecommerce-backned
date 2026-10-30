@@ -3,16 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ApiLoginRequest;
+use App\Http\Requests\ApiRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Traits\ApiResponse as TraitsApiResponse;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class AuthController extends Controller
 {
-    use TraitsApiResponse;
+    use ApiResponse;
     
     public function login(ApiLoginRequest $request): JsonResponse {
         $validated = $request->validated();
@@ -31,5 +35,41 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
             'user' => new UserResource($user)
         ], 'Login success.', 200);
+    }
+
+    public function register(ApiRegisterRequest $request): JsonResponse {
+        $validated = $request->validated();
+
+        // Search other user email for uniqeness
+        $existingUser = User::where('email', $validated['email'])->first();
+        if ($existingUser){
+            return $this->error('Email already exists.', 409);
+        }
+
+        // Check if the password and the confirmation password are match
+        if ($validated['password'] !== $validated['confirm_password']) {
+            return $this->error("Password and confirmation password doesn't match.", 400);
+        }
+
+        // Perform make new user
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return $this->ok([
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user
+        ], "Register success", 201);
+    }
+
+    public function logout(Request $req): JsonResponse {
+        $req->user()->currentAccessToken()->delete();
+
+        return $this->ok(null, 'Logout successful');
     }
 }

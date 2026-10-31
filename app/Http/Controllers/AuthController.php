@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ApiLoginRequest;
-use App\Http\Requests\ApiRegisterRequest;
+use App\Http\Requests\Auth\ApiLoginRequest;
+use App\Http\Requests\Auth\ApiRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class AuthController extends Controller
 {

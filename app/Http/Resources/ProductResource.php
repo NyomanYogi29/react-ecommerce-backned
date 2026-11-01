@@ -22,7 +22,7 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'image' => $this->image,
             'rating' => $this->rating,
-            'review_count' => $this->reviewCount,
+            'review_count' => $this->whenCounted('reviews'),
             'description' => $this->description,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),

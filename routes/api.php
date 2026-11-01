@@ -15,7 +15,8 @@ Route::prefix('v1')->group(function() {
         // Product's endpoints
         Route::controller(ProductController::class)->group(function () {
             Route::get('/product/all', 'getAll');
-            Route::get('/product/{id}', 'get');
+            Route::get('/product/{product}', 'get');
+            Route::post('/product/{id}', 'create');
         });
     });
 });

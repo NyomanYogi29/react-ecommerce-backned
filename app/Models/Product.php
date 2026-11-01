@@ -35,10 +35,15 @@ class Product extends Model
 
     protected function casts(): array {
         return [
+            'name' => 'string',
+            'seller' => 'string',
+            'category' => 'string',
             'stock' => 'integer',
             'price' => 'decimal:2',
+            'image' => 'string',
             'rating' => 'float',
-            'review_count' => 'integer'
+            'review_count' => 'integer',
+            'description' => 'string'
         ];
     }
 

@@ -2,21 +2,24 @@
 
 namespace App\Http\Middleware;
 
+use App\Traits\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserIsSeller
 {
+    use ApiResponse;
+
     /**
      * Handle an incoming request.
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() || $request->user()->role !== 'seller') {
-            abort(403, 'Unauthorized action.');
+        if ($request->user()->role !== 'seller') {
+            return $this->forbidden('You cannot access this content');
         }
 
         return $next($request);

@@ -14,9 +14,14 @@ Route::prefix('v1')->group(function() {
 
         // Product's endpoints
         Route::controller(ProductController::class)->group(function () {
-            Route::get('/product/all', 'getAll');
+            Route::get('/product', 'getAll');
             Route::get('/product/{product}', 'get');
-            Route::post('/product/{id}', 'create');
+            Route::middleware('seller')->group(function() {
+                Route::post('/product', 'create');
+                Route::match(['patch', 'put'], '/product/{product}', 'update');
+                Route::delete('/product/{product}', 'delete');
+            });
+            
         });
     });
 });

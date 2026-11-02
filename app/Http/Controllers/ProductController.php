@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\CategoryInterface\CategoryFinder;
-use App\Contracts\ProductInterface\ProductCreator;
-use App\Contracts\ProductInterface\ProductFinder;
+use App\Contracts\CategoryInterface;
+use App\Contracts\ProductInterface;
 use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
-use App\Models\Category;
 use App\Models\Product;
-use App\Repository\CategoryRepository;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -20,12 +17,11 @@ class ProductController extends Controller
     use ApiResponse;
 
     public function __construct(
-        private CategoryFinder $categoryFinder,
-        private ProductFinder $productFinder,
-        private ProductCreator $productCreator
+        private CategoryInterface $categoryInterface,
+        private ProductInterface $productInterface
     ) {}
     public function getAll(): JsonResponse {
-        $products = $this->productFinder->getAll();
+        $products = $this->productInterface->getAll();
         return $this->ok(ProductResource::collection($products), "Successfully retrieved all the product");
     }
 
@@ -38,9 +34,9 @@ class ProductController extends Controller
 
         $sellerId = $request->user()->id;
 
-        $categoryId = $this->categoryFinder->getIdByName($validated['category']);
+        $categoryId = $this->categoryInterface->getIdByName($validated['category']);
 
-        $newProduct = $this->productCreator->create([
+        $newProduct = $this->productInterface->create([
             'name' => $validated['name'],
             'user_id' => $sellerId,
             'category_id' => $categoryId,
@@ -57,7 +53,7 @@ class ProductController extends Controller
         );
     }
 
-    public function update(UpdateProductRequest $updateProduct, Product $product) {
+    public function update(UpdateProductRequest $updateProduct, Product $product): JsonResponse {
         if($product->user_id !== Auth::id()) {
             return $this->forbidden('You are not authorized to modify this product.');
         } 
@@ -65,14 +61,14 @@ class ProductController extends Controller
         $data = $updateProduct->validated();
 
         if(!empty($data['category'])) {
-            $category = $this->categoryFinder->getIdByName($data['name']);
+            $category = $this->categoryInterface->getIdByName($data['name']);
             if ($category) {
                 $data['category_id'] = $category;
             }
             unset($data['category']);
         }
 
-        $product->update($data);
+        $this->productInterface->update($product, $data);
 
         return $this->ok(
             new ProductResource($product),
@@ -80,11 +76,11 @@ class ProductController extends Controller
         );
     }
 
-    public function delete(Product $product) {
+    public function delete(Product $product): JsonResponse {
         if ($product->user_id !== Auth::id()) {
             return $this->forbidden('You are not authorized to modify this product');
         }
-        $product->delete();
+        $this->productInterface->delete($product); 
         return $this->deleted($product->id);
     }
 }

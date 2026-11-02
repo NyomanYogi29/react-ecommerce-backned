@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Contract\UserInterface\UserCreatorInterface;
-use App\Contracts\UserInterface\UserFinderInterface;
+use App\Contracts\UserInterface;
 use App\Http\Requests\Auth\ApiLoginRequest;
 use App\Http\Requests\Auth\ApiRegisterRequest;
 use App\Http\Resources\UserResource;
-use App\Models\User;
-use App\Repository\UserRepository;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,14 +17,13 @@ class AuthController extends Controller
     use ApiResponse;
 
     public function __construct(
-        private UserCreatorInterface $userCreator,
-        private UserFinderInterface $userFinder
+        private UserInterface $userInterface
     ) {}
     
     public function login(ApiLoginRequest $request): JsonResponse {
         $validated = $request->validated();
 
-        $user = $this->userFinder->getByEmail($validated['email']);
+        $user = $this->userInterface->getByEmail($validated['email']);
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials']
@@ -47,7 +43,7 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         // Search other user email for uniqeness
-        $existingUser = $this->userFinder->getByEmail($validated['email']);
+        $existingUser = $this->userInterface->getByEmail($validated['email']);
         if ($existingUser){
             return $this->error('Email already exists.', 409);
         }
@@ -58,7 +54,7 @@ class AuthController extends Controller
         }
 
         // Perform make new user
-        $user = $this->userCreator->create([
+        $user = $this->userInterface->create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],

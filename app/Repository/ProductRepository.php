@@ -9,10 +9,15 @@ use Override;
 
 class ProductRepository implements ProductInterface{
     #[Override]
+    public function get(Product $product): Product
+    {
+        return $product->loadMissing(['category', 'user']);
+    }
+
+    #[Override]
     public function getAll(): Collection
     {
-        $products = Product::with(['category', 'user'])->get();
-        return $products;
+        return Product::with(['category', 'user'])->get();
     }
 
     #[Override]

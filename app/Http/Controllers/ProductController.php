@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Contracts\CategoryInterface;
 use App\Contracts\ProductInterface;
+use App\Contracts\ReviewsInterface;
 use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ReviewsResource;
 use App\Models\Product;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
@@ -18,15 +21,27 @@ class ProductController extends Controller
 
     public function __construct(
         private CategoryInterface $categoryInterface,
-        private ProductInterface $productInterface
+        private ProductInterface $productInterface,
+        private ReviewsInterface $reviewsInterface
     ) {}
     public function getAll(): JsonResponse {
         $products = $this->productInterface->getAll();
         return $this->ok(ProductResource::collection($products), "Successfully retrieved all the product");
     }
 
-    public function get(Product $product): JsonResponse {
-        return $this->ok(new ProductResource($product->loadCount('reviews')));
+    public function get(Request $request, Product $product): JsonResponse {
+        $product = $this->productInterface->get($product);
+
+        $perPage = $request->integer('per_page', 10);
+
+        $paginatedReviews = $this->reviewsInterface->getWithPaginated($product, $perPage);
+
+        return $this->ok(
+            [
+                'product' => new ProductResource($product),
+                'reviews' => ReviewsResource::collection($paginatedReviews)->response()->getData(true)
+            ], 'Product detail retrieve successfully'
+        );
     }
 
     public function create(CreateProductRequest $request) {

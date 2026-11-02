@@ -5,7 +5,7 @@ test('that true is true', function () {
 });
 
 test('This should return 200', function () {
-    $response = $this->get("/");
+    $response = $this->get('/');
 
     $response->assertStatus(200);
 });

@@ -5,7 +5,8 @@ namespace App\Repository;
 use App\Contracts\UserInterface;
 use App\Models\User;
 
-class UserRepository implements UserInterface {
+class UserRepository implements UserInterface
+{
     public function getByEmail(string $email): User
     {
         return User::where('email', $email)->first();

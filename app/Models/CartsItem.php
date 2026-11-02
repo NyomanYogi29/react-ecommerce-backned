@@ -20,21 +20,24 @@ class CartsItem extends Model
         'cart_id',
         'product_name',
         'quantity',
-        'subtotal'
+        'subtotal',
     ];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'quantity' => 'integer',
-            'subtotal' => 'float'
+            'subtotal' => 'float',
         ];
     }
 
-    public function carts(): BelongsTo {
+    public function carts(): BelongsTo
+    {
         return $this->belongsTo(Carts::class, 'cart_id', 'id');
     }
 
-    public function products(): BelongsTo {
+    public function products(): BelongsTo
+    {
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

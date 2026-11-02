@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Reviews extends Model
 {
     use HasUuids;
+
     protected $table = 'reviews';
 
     protected $fillable = [
@@ -19,20 +20,23 @@ class Reviews extends Model
     ];
 
     protected $attributes = [
-        'rating' => 1
+        'rating' => 1,
     ];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
-            'rating' => 'integer'
+            'rating' => 'integer',
         ];
     }
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function product(): BelongsTo {
+    public function product(): BelongsTo
+    {
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

@@ -24,7 +24,7 @@ class CreateReviewRequest extends FormRequest
     {
         return [
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'comment' => ['nullable', 'string', 'max:250']
+            'comment' => ['nullable', 'string', 'max:250'],
         ];
     }
 }

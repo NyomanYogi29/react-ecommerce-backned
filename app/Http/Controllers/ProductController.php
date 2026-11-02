@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\CategoryInterface;
+use App\Contracts\FileUploadInterface;
 use App\Contracts\ProductInterface;
 use App\Contracts\ReviewsInterface;
 use App\Http\Requests\Product\CreateProductRequest;
@@ -22,14 +23,19 @@ class ProductController extends Controller
     public function __construct(
         private CategoryInterface $categoryInterface,
         private ProductInterface $productInterface,
-        private ReviewsInterface $reviewsInterface
+        private ReviewsInterface $reviewsInterface,
+        private FileUploadInterface $fileUploadInterface
     ) {}
-    public function getAll(): JsonResponse {
+
+    public function getAll(): JsonResponse
+    {
         $products = $this->productInterface->getAll();
-        return $this->ok(ProductResource::collection($products), "Successfully retrieved all the product");
+
+        return $this->ok(ProductResource::collection($products), 'Successfully retrieved all the product');
     }
 
-    public function get(Request $request, Product $product): JsonResponse {
+    public function get(Request $request, Product $product): JsonResponse
+    {
         $product = $this->productInterface->get($product);
 
         $perPage = $request->integer('per_page', 10);
@@ -39,63 +45,87 @@ class ProductController extends Controller
         return $this->ok(
             [
                 'product' => new ProductResource($product),
-                'reviews' => ReviewsResource::collection($paginatedReviews)->response()->getData(true)
-            ], 'Product detail retrieve successfully'
+                'reviews' => ReviewsResource::collection($paginatedReviews)->response()->getData(true),
+            ],
+            'Product detail retrieve successfully'
         );
     }
 
-    public function create(CreateProductRequest $request) {
+    public function create(CreateProductRequest $request): JsonResponse
+    {
         $validated = $request->validated();
 
         $sellerId = $request->user()->id;
 
         $categoryId = $this->categoryInterface->getIdByName($validated['category']);
 
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            $imageUrl = $this->fileUploadInterface->upload($request->file('image'), 'products');
+        }
+
         $newProduct = $this->productInterface->create([
             'name' => $validated['name'],
             'user_id' => $sellerId,
             'category_id' => $categoryId,
             'price' => $validated['price'],
-            'image' => $validated['image'],
-            'stock' => $validated['stock'],
-            'description' => $validated['description']
+            'image' => $imageUrl,
+            'stock' => $validated['stock'] ?? 0,
+            'description' => $validated['description'] ?? null,
         ]);
 
         return $this->ok(
-            new ProductResource($newProduct), 
+            new ProductResource($newProduct),
             'Product created',
             201
         );
     }
 
-    public function update(UpdateProductRequest $updateProduct, Product $product): JsonResponse {
-        if($product->user_id !== Auth::id()) {
+    public function update(UpdateProductRequest $updateProduct, Product $product): JsonResponse
+    {
+        if ($product->user_id !== Auth::id()) {
             return $this->forbidden('You are not authorized to modify this product.');
-        } 
-        
+        }
+
         $data = $updateProduct->validated();
 
-        if(!empty($data['category'])) {
-            $category = $this->categoryInterface->getIdByName($data['name']);
+        if (! empty($data['category'])) {
+            $category = $this->categoryInterface->getIdByName($data['category']);
             if ($category) {
                 $data['category_id'] = $category;
             }
             unset($data['category']);
         }
 
+        if ($updateProduct->hasFile('image')) {
+            if ($product->image) {
+                $this->fileUploadInterface->delete($product->image);
+            }
+            $data['image'] = $this->fileUploadInterface->upload($updateProduct->file('image'), 'products');
+        } else {
+            unset($data['image']);
+        }
+
         $this->productInterface->update($product, $data);
 
         return $this->ok(
-            new ProductResource($product),
+            new ProductResource($product->fresh(['category', 'user'])),
             'Product updated successfully',
         );
     }
 
-    public function delete(Product $product): JsonResponse {
+    public function delete(Product $product): JsonResponse
+    {
         if ($product->user_id !== Auth::id()) {
             return $this->forbidden('You are not authorized to modify this product');
         }
-        $this->productInterface->delete($product); 
+
+        if ($product->image) {
+            $this->fileUploadInterface->delete($product->image);
+        }
+
+        $this->productInterface->delete($product);
+
         return $this->deleted($product->id);
     }
 }

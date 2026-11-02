@@ -1,13 +1,14 @@
-<?php 
+<?php
 
 namespace App\Contracts;
 
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 
-interface ProductInterface {
+interface ProductInterface
+{
     public function get(Product $product): Product;
-    
+
     public function create(array $data): Product;
 
     public function getAll(): Collection;

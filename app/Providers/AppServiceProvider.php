@@ -3,10 +3,14 @@
 namespace App\Providers;
 
 use App\Contracts\CategoryInterface;
+use App\Contracts\FileStorageInterface;
+use App\Contracts\FileUploadInterface;
 use App\Contracts\ProductInterface;
 use App\Contracts\ReviewsInterface;
 use App\Contracts\UserInterface;
 use App\Repository\CategoryRepository;
+use App\Repository\FileStorageRepository;
+use App\Repository\FileUploadRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ReviewsRepository;
 use App\Repository\UserRepository;
@@ -21,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // User binding
         $this->app->bind(UserInterface::class, UserRepository::class);
-        
+
         // Category binding
         $this->app->bind(CategoryInterface::class, CategoryRepository::class);
 
@@ -30,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Reviews binding
         $this->app->bind(ReviewsInterface::class, ReviewsRepository::class);
+
+        // File upload binding
+        $this->app->bind(FileUploadInterface::class, FileUploadRepository::class);
+        $this->app->bind(FileStorageInterface::class, FileStorageRepository::class);
     }
 
     /**

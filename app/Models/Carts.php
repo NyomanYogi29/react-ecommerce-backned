@@ -17,26 +17,29 @@ class Carts extends Model
         'user_id',
         'product_id',
         'product_count',
-        'final_price'
+        'final_price',
     ];
 
     protected $attributes = [
         'product_count' => 0,
-        'final_price' => 0
+        'final_price' => 0,
     ];
 
-    protected function cast(): array {
+    protected function cast(): array
+    {
         return [
             'product_count' => 'integer',
-            'final_price' => 'float'
+            'final_price' => 'float',
         ];
     }
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function cartsItem(): HasMany {
+    public function cartsItem(): HasMany
+    {
         return $this->hasMany(CartsItem::class, 'cart_id', 'id');
-    } 
+    }
 }

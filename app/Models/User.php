@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,17 +13,17 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasUuids, HasApiTokens;
+    use HasApiTokens, HasFactory, HasUuids, Notifiable;
 
     protected $fillable = [
-        'name', 
-        'email', 
-        'password', 
-        'role'
+        'name',
+        'email',
+        'password',
+        'role',
     ];
 
     protected $hidden = [
-        'password'
+        'password',
     ];
 
     /**
@@ -39,23 +38,28 @@ class User extends Authenticatable
         ];
     }
 
-    public function isSeller(): bool {
+    public function isSeller(): bool
+    {
         return $this->role === 'seller';
     }
 
-    public function product(): HasMany {
+    public function product(): HasMany
+    {
         return $this->hasMany(Product::class, 'user_id', 'id');
     }
 
-    public function reviews(): HasMany {
+    public function reviews(): HasMany
+    {
         return $this->hasMany(Reviews::class, 'user_id', 'id');
     }
 
-    public function carts(): HasMany {
+    public function carts(): HasMany
+    {
         return $this->hasMany(Carts::class, 'user_id', 'id');
     }
 
-    public function invoices(): HasMany {
+    public function invoices(): HasMany
+    {
         return $this->hasMany(Invoices::class, 'user_id', 'id');
     }
 }

@@ -21,7 +21,7 @@ class ReviewsResource extends JsonResource
             'rating' => $this->rating,
             'comment' => $this->comment,
             'created_at' => $this->created_at?->toISOString(),
-            'updated-at' => $this->updated_at?->toISOString()
+            'updated-at' => $this->updated_at?->toISOString(),
         ];
     }
 }

@@ -26,7 +26,7 @@ class ApiRegisterRequest extends FormRequest
             'name' => ['string', 'required', 'max:255'],
             'email' => ['string', 'required', 'email'],
             'password' => ['string', 'required'],
-            'confirm_password' => ['string', 'required']
+            'confirm_password' => ['string', 'required'],
         ];
     }
 }

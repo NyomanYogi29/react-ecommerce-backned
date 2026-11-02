@@ -2,7 +2,8 @@
 
 namespace App\Contracts;
 
-interface TrancsactionManager {
+interface TrancsactionManager
+{
     public function beginTransaction(): void;
 
     public function commit(): void;

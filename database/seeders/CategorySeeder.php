@@ -16,10 +16,10 @@ class CategorySeeder extends Seeder
             'All',
             'Headphones',
             'Smartwatch',
-            'Mouse'
+            'Mouse',
         ];
 
-        foreach($category_names as $name) {
+        foreach ($category_names as $name) {
             Category::firstOrCreate(['name' => $name]);
         }
     }

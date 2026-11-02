@@ -14,7 +14,8 @@ class ReviewsController extends Controller
         private ReviewsInterface $reviewsInterface
     ) {}
 
-    public function create(CreateReviewRequest $request, Product $product): JsonResponse {
+    public function create(CreateReviewRequest $request, Product $product): JsonResponse
+    {
         $userId = $request->user()->id;
 
         $data = $request->validated();
@@ -23,13 +24,13 @@ class ReviewsController extends Controller
             'user_id' => $userId,
             'product_id' => $product->id,
             'rating' => $data['rating'],
-            'comment' => $data['comment'] ?? null
+            'comment' => $data['comment'] ?? null,
         ]);
 
         return $this->ok(
-            new ReviewsResource($reviews), 
+            new ReviewsResource($reviews),
             'Reviews created',
             201
-        );        
+        );
     }
 }

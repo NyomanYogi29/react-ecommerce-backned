@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -23,8 +22,9 @@ class ProductSeeder extends Seeder
         // Find the seller's id
         $seller = User::where('role', 'seller')->first() ?? User::first();
 
-        if (!$seller && !$headphone) {
+        if (! $seller && ! $headphone) {
             $this->command->warn('Make sure there are seller and categorys data are ready');
+
             return;
         }
 
@@ -39,7 +39,7 @@ class ProductSeeder extends Seeder
                 'image' => null,
                 'rating' => 4.8,
                 'review_count' => 13,
-                'description' => 'Headphone nirkabel premium dengan peredam bising terdepan di industri (Industry-leading Noise Cancellation) berkat dua prosesor dan delapan mikrofon. Dilengkapi driver 30mm yang presisi, daya tahan baterai hingga 30 jam, serta desain ultra-nyaman dan ringan untuk pemakaian seharian penuh.'
+                'description' => 'Headphone nirkabel premium dengan peredam bising terdepan di industri (Industry-leading Noise Cancellation) berkat dua prosesor dan delapan mikrofon. Dilengkapi driver 30mm yang presisi, daya tahan baterai hingga 30 jam, serta desain ultra-nyaman dan ringan untuk pemakaian seharian penuh.',
             ],
             [
                 'name' => 'Logitech G PRO X SUPERLIGHT 2 Wireless Gaming Mouse',
@@ -50,7 +50,7 @@ class ProductSeeder extends Seeder
                 'image' => null,
                 'rating' => 4.25,
                 'review_count' => 10,
-                'description' => 'Evolusi mouse gaming esport paling dominan di kancah turnamen profesional. Menghadirkan switch hybrid optik-mekanikal LIGHTFORCE untuk kecepatan kilat dan ketahanan klik mekanik yang memuaskan. Menggunakan sensor HERO 2 dengan akurasi sub-mikron dan port modern USB-C.'
+                'description' => 'Evolusi mouse gaming esport paling dominan di kancah turnamen profesional. Menghadirkan switch hybrid optik-mekanikal LIGHTFORCE untuk kecepatan kilat dan ketahanan klik mekanik yang memuaskan. Menggunakan sensor HERO 2 dengan akurasi sub-mikron dan port modern USB-C.',
             ],
             [
                 'name' => 'Huawei Watch GT 4 46mm Smartwatch',
@@ -61,11 +61,11 @@ class ProductSeeder extends Seeder
                 'image' => null,
                 'rating' => 4.75,
                 'review_count' => 9,
-                'description' => 'Menggabungkan estetika jam tangan klasik berbentuk segi delapan dengan teknologi kesehatan terdepan. Daya tahan baterai legendaris hingga 14 hari pemakaian. Kompatibel dengan perangkat Android maupun iOS, dilengkapi manajemen kalori dan pelacakan tidur TruSleep 3.0.'
+                'description' => 'Menggabungkan estetika jam tangan klasik berbentuk segi delapan dengan teknologi kesehatan terdepan. Daya tahan baterai legendaris hingga 14 hari pemakaian. Kompatibel dengan perangkat Android maupun iOS, dilengkapi manajemen kalori dan pelacakan tidur TruSleep 3.0.',
             ],
         ];
 
-        foreach($products as $product) {
+        foreach ($products as $product) {
             Product::firstOrCreate(
                 ['name' => $product['name']],
                 $product

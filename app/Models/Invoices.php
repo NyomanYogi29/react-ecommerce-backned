@@ -17,26 +17,29 @@ class Invoices extends Model
         'user_id',
         'final_price',
         'status',
-        'paid_at'
+        'paid_at',
     ];
 
     protected $attributes = [
         'status' => 'pending',
-        'final_price' => 0
+        'final_price' => 0,
     ];
 
-    public function casts(): array {
+    public function casts(): array
+    {
         return [
             'final_price' => 'float',
-            'status' => ["pending", "paid", "cancelled"]
+            'status' => ['pending', 'paid', 'cancelled'],
         ];
     }
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function invoicesItem(): HasMany {
+    public function invoicesItem(): HasMany
+    {
         return $this->hasMany(InvoicesItem::class, 'invoice_id', 'id');
     }
 }

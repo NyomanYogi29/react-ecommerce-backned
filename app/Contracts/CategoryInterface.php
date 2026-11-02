@@ -2,6 +2,7 @@
 
 namespace App\Contracts;
 
-interface CategoryInterface {
+interface CategoryInterface
+{
     public function getIdByName(string $name): string;
 }

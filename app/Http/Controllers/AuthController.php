@@ -19,14 +19,15 @@ class AuthController extends Controller
     public function __construct(
         private UserInterface $userInterface
     ) {}
-    
-    public function login(ApiLoginRequest $request): JsonResponse {
+
+    public function login(ApiLoginRequest $request): JsonResponse
+    {
         $validated = $request->validated();
 
         $user = $this->userInterface->getByEmail($validated['email']);
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Invalid credentials']
+                'email' => ['Invalid credentials'],
             ]);
         }
 
@@ -35,16 +36,17 @@ class AuthController extends Controller
         return $this->ok([
             'token' => $token,
             'token_type' => 'Bearer',
-            'user' => new UserResource($user)
+            'user' => new UserResource($user),
         ], 'Login success.', 200);
     }
 
-    public function register(ApiRegisterRequest $request): JsonResponse {
+    public function register(ApiRegisterRequest $request): JsonResponse
+    {
         $validated = $request->validated();
 
         // Search other user email for uniqeness
         $existingUser = $this->userInterface->getByEmail($validated['email']);
-        if ($existingUser){
+        if ($existingUser) {
             return $this->error('Email already exists.', 409);
         }
 
@@ -65,11 +67,12 @@ class AuthController extends Controller
         return $this->ok([
             'token' => $token,
             'token_type' => 'Bearer',
-            'user' => new UserResource($user)
-        ], "Register success", 201);
+            'user' => new UserResource($user),
+        ], 'Register success', 201);
     }
 
-    public function logout(Request $req): JsonResponse {
+    public function logout(Request $req): JsonResponse
+    {
         $req->user()->currentAccessToken()->delete();
 
         return $this->ok(null, 'Logout successful');

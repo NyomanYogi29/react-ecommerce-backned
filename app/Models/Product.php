@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     protected $table = 'products';
 
@@ -30,10 +30,11 @@ class Product extends Model
         'stock' => 0,
         'price' => 0,
         'rating' => 1.0,
-        'review_count' => 0
+        'review_count' => 0,
     ];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'name' => 'string',
             'seller' => 'string',
@@ -43,27 +44,32 @@ class Product extends Model
             'image' => 'string',
             'rating' => 'float',
             'review_count' => 'integer',
-            'description' => 'string'
+            'description' => 'string',
         ];
     }
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function seller(): BelongsTo {
+    public function seller(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function category(): BelongsTo {
+    public function category(): BelongsTo
+    {
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
-    public function reviews(): HasMany {
+    public function reviews(): HasMany
+    {
         return $this->hasMany(Reviews::class, 'product_id', 'id');
     }
 
-    public function invoicesItems(): HasMany {
+    public function invoicesItems(): HasMany
+    {
         return $this->hasMany(InvoicesItem::class, 'product_id', 'id');
     }
 }

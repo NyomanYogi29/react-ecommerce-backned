@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Contract\UserInterface\UserCreatorInterface;
+use App\Contracts\UserInterface\UserFinderInterface;
 use App\Http\Requests\Auth\ApiLoginRequest;
 use App\Http\Requests\Auth\ApiRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Repository\UserRepository;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,11 +18,16 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     use ApiResponse;
+
+    public function __construct(
+        private UserCreatorInterface $userCreator,
+        private UserFinderInterface $userFinder
+    ) {}
     
     public function login(ApiLoginRequest $request): JsonResponse {
         $validated = $request->validated();
 
-        $user = User::where('email', $validated['email'])->first();
+        $user = $this->userFinder->getByEmail($validated['email']);
         if (!$user || !Hash::check($validated['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials']
@@ -39,7 +47,7 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         // Search other user email for uniqeness
-        $existingUser = User::where('email', $validated['email'])->first();
+        $existingUser = $this->userFinder->getByEmail($validated['email']);
         if ($existingUser){
             return $this->error('Email already exists.', 409);
         }
@@ -50,7 +58,7 @@ class AuthController extends Controller
         }
 
         // Perform make new user
-        $user = User::create([
+        $user = $this->userCreator->create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
@@ -61,7 +69,7 @@ class AuthController extends Controller
         return $this->ok([
             'token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user
+            'user' => new UserResource($user)
         ], "Register success", 201);
     }
 

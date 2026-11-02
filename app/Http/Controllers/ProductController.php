@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\CategoryInterface\CategoryFinder;
+use App\Contracts\ProductInterface\ProductCreator;
+use App\Contracts\ProductInterface\ProductFinder;
 use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Product;
+use App\Repository\CategoryRepository;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +18,14 @@ use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     use ApiResponse;
+
+    public function __construct(
+        private CategoryFinder $categoryFinder,
+        private ProductFinder $productFinder,
+        private ProductCreator $productCreator
+    ) {}
     public function getAll(): JsonResponse {
-        $products = Product::with(['category', 'user'])->get();
+        $products = $this->productFinder->getAll();
         return $this->ok(ProductResource::collection($products), "Successfully retrieved all the product");
     }
 
@@ -28,12 +38,12 @@ class ProductController extends Controller
 
         $sellerId = $request->user()->id;
 
-        $categoryId = Category::where('name', $validated['category'])->firstOrFail();
+        $categoryId = $this->categoryFinder->getIdByName($validated['category']);
 
-        $newProduct = Product::create([
+        $newProduct = $this->productCreator->create([
             'name' => $validated['name'],
             'user_id' => $sellerId,
-            'category_id' => $categoryId->id,
+            'category_id' => $categoryId,
             'price' => $validated['price'],
             'image' => $validated['image'],
             'stock' => $validated['stock'],
@@ -55,9 +65,9 @@ class ProductController extends Controller
         $data = $updateProduct->validated();
 
         if(!empty($data['category'])) {
-            $category = Category::where('name', $data['category'])->first();
+            $category = $this->categoryFinder->getIdByName($data['name']);
             if ($category) {
-                $data['category_id'] = $category->id;
+                $data['category_id'] = $category;
             }
             unset($data['category']);
         }

@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\ReviewsInterface;
-use App\Http\Requests\CreateReviewRequest;
+use App\Http\Requests\Reviews\CreateReviewRequest;
 use App\Http\Resources\ReviewsResource;
 use App\Models\Product;
-use App\Repository\ReviewsRepository;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ReviewsController extends Controller
 {
@@ -25,7 +23,7 @@ class ReviewsController extends Controller
             'user_id' => $userId,
             'product_id' => $product->id,
             'rating' => $data['rating'],
-            'comment' => $data['comment']
+            'comment' => $data['comment'] ?? null
         ]);
 
         return $this->ok(

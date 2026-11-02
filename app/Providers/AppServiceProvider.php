@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Contracts\CategoryInterface;
 use App\Contracts\ProductInterface;
+use App\Contracts\ReviewsInterface;
 use App\Contracts\UserInterface;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
+use App\Repository\ReviewsRepository;
 use App\Repository\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Product binding
         $this->app->bind(ProductInterface::class, ProductRepository::class);
+
+        // Reviews binding
+        $this->app->bind(ReviewsInterface::class, ReviewsRepository::class);
     }
 
     /**

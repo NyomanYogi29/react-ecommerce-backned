@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ReviewsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function() {
@@ -21,7 +21,10 @@ Route::prefix('v1')->group(function() {
                 Route::match(['patch', 'put'], '/product/{product}', 'update');
                 Route::delete('/product/{product}', 'delete');
             });
-            
+        });
+
+        Route::controller(ReviewsController::class)->group(function () {
+            Route::post('/product/{product}/review', 'create');
         });
     });
 });
